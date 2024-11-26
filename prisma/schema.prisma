@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  imageUrl String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  times Time[]
+
+  @@map("user")
+}
+
+model Jogo {
+  id               String @id @default(uuid())
+  nome             String
+  maxJogadores     Int    @default(5)
+  logoUrl          String
+  emailResponsavel String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  times Time[]
+
+  @@map("jogo")
+}
+
+model Time {
+  id      String @id @default(uuid())
+  nome    String
+  jogoId  String
+  ownerId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jogo      Jogo      @relation(fields: [jogoId], references: [id], onDelete: Restrict)
+  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  jogadores Jogador[]
+
+  @@map("time")
+}
+
+model Jogador {
+  id       String  @id @default(uuid())
+  nome     String
+  turma    String?
+  discord  String?
+  telefone String
+  role     String  @default("player")
+  timeId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  time Time @relation(fields: [timeId], references: [id], onDelete: Restrict)
+
+  @@map("jogador")
+}
+
+model NerdIF {
+  id                   String    @id @default(uuid())
+  dataInicioInscricoes DateTime
+  dataFinalIncricoes   DateTime?
+  // A = Aberto | F = Fechado | E = Encerrando
+  status               String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nerdif")
+}
